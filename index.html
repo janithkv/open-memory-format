@@ -61,8 +61,8 @@
   .sample .prose p { margin:0 0 14px; color:#4a4458; }
   figure.code { margin:0; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
   figure.code figcaption { font-family:var(--mono); font-size:12.5px; color:var(--muted); padding:12px 18px; border-bottom:1px solid var(--border-light); background:var(--code-bg); }
-  pre { margin:0; padding:20px 18px; overflow-x:auto; }
-  code { font-family:var(--mono); font-size:13.5px; line-height:1.7; color:#3a3348; }
+  pre { margin:0; padding:20px 18px; white-space:pre-wrap; overflow-wrap:anywhere; }
+  code { font-family:var(--mono); font-size:13px; line-height:1.7; color:#3a3348; }
   .tok-key { color:var(--accent); }
   .tok-link { color:var(--plum); font-weight:500; }
   .tok-comment { color:var(--muted); }
@@ -153,8 +153,9 @@
         <figcaption>Journals/2026/07/2026-07-03.md</figcaption>
 <pre><code># A good day
 
-Had coffee with <span class="tok-link">[[People/jane-doe|@Jane]]</span>.
-Started planning <span class="tok-link">[[Projects/learn-piano]]</span>. Felt @grateful.</code></pre>
+Coffee with <span class="tok-link">[[People/jane-doe|@Jane]]</span>.
+Planning <span class="tok-link">[[Projects/learn-piano]]</span>.
+Felt @grateful.</code></pre>
       </figure>
     </div>
     <div class="sample" style="margin-top:28px;">
@@ -166,7 +167,7 @@ Started planning <span class="tok-link">[[Projects/learn-piano]]</span>. Felt @g
 <span class="tok-key">home:</span> <span class="tok-link">[[Places/anytown]]</span>
 <span class="tok-comment">---</span>
 
-A placeholder person, here to show the entity-file shape.</code></pre>
+A placeholder person, to show the entity shape.</code></pre>
       </figure>
       <div class="prose">
         <h2>Everything else is an entity.</h2>
