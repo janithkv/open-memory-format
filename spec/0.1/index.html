@@ -65,6 +65,7 @@
   footer { margin-top:72px; padding-top:28px; border-top:1px solid var(--border); color:var(--muted); font-size:14px; }
   footer a { color:var(--accent); }
 </style>
+<style>.secref{color:#8F45AD;text-decoration:none;border-bottom:1px solid rgba(143,69,173,.28);white-space:nowrap;}.secref:hover{border-bottom-color:#8F45AD;}</style>
 </head>
 <body>
 <div class="wrap">
@@ -116,9 +117,9 @@
       <li><code>[[wikilinks]]</code> and <code>![[embeds]]</code> for cross-references (Obsidian-compatible).</li>
     </ul>
     <p>A vault is portable by construction: it is just files in a folder, in any storage the user controls (local disk, Google Drive, Dropbox, …). Any app that follows this spec can read and write the same vault.</p>
-    <p>Files come in three <strong>kinds</strong> (§4.3): <strong>entity</strong> (one subject per file), <strong>metric</strong> (a dated numeric table), and <strong>log</strong> (a timeline of dated sections). All three are plain Markdown with YAML frontmatter; they differ only in body shape. UTF-8, LF line endings throughout.</p>
+    <p>Files come in three <strong>kinds</strong> (<a class="secref" href="#s4-3">Section 4.3</a>): <strong>entity</strong> (one subject per file), <strong>metric</strong> (a dated numeric table), and <strong>log</strong> (a timeline of dated sections). All three are plain Markdown with YAML frontmatter; they differ only in body shape. UTF-8, LF line endings throughout.</p>
 
-    <h3>0.1 · Scope &amp; non-goals</h3>
+    <h3 id="s0-1">0.1 · Scope &amp; non-goals</h3>
     <p>OMF is a <strong>portability / migration</strong> format: it guarantees that a vault written by one OMF app can be fully read (and taken over) by another. It is <strong>not</strong> a concurrent multi-writer protocol — two apps editing the same vault at once is out of scope, so OMF does <strong>not</strong> define merge/conflict semantics (writers may assume last-write-wins). This keeps the format simple: your data is portable, without the complexity of real-time co-editing.</p>
   </section>
 
@@ -132,12 +133,12 @@
   Projects/&lt;slug&gt;.md
   Dreams/&lt;slug&gt;.md          # apps MAY define further collections
   Movies/&lt;slug&gt;.md
-  Health/&lt;metric&gt;.md        # metric kind (§4.3)
-  F1/&lt;season&gt;.md            # log kind (§4.3)
+  Health/&lt;metric&gt;.md        # metric kind (Section 4.3)
+  F1/&lt;season&gt;.md            # log kind (Section 4.3)
   Photos/                   # binary attachments (images, …)
-  orma_settings.json        # vault settings + identity (§7)</code></pre>
+  orma_settings.json        # vault settings + identity (Section 7)</code></pre>
     <ul>
-      <li>Top-level folder name = the <strong>collection</strong>; for entity collections it is the singular <code>type</code> (§4).</li>
+      <li>Top-level folder name = the <strong>collection</strong>; for entity collections it is the singular <code>type</code> (<a class="secref" href="#s4">Section 4</a>).</li>
       <li>One file per subject (entity) / metric / timeline; the file's <strong>slug</strong> (filename without <code>.md</code>) is its identity within the collection.</li>
       <li>Folders an app doesn't recognize MUST be preserved untouched (forward-compat).</li>
     </ul>
@@ -156,7 +157,7 @@
 <pre><code># A good day
 
 Had coffee with [[People/jane-doe|@Jane]]. Felt @grateful.</code></pre>
-    <p>The <strong>date is carried by the filename</strong>, not the body. A journal also surfaces what you logged elsewhere that day (§5.6).</p>
+    <p>The <strong>date is carried by the filename</strong>, not the body. A journal also surfaces what you logged elsewhere that day (<a class="secref" href="#s5-6">Section 5.6</a>).</p>
   </section>
 
   <section id="s4">
@@ -174,14 +175,14 @@ Optional free-text notes go here.</code></pre>
     <h4>4.1 · Frontmatter fields</h4>
     <ul>
       <li><strong><code>name</code></strong> (string, required) — display name.</li>
-      <li><strong><code>type</code></strong> (string, required) — entity type. The <strong>folder is the primary type</strong> (<code>People</code>→<code>person</code>, …). <code>type</code> MAY deviate to mark a variant: <code>self</code> (vault owner, §6) or <code>series</code> (a TV series in <code>Movies/</code>).</li>
+      <li><strong><code>type</code></strong> (string, required) — entity type. The <strong>folder is the primary type</strong> (<code>People</code>→<code>person</code>, …). <code>type</code> MAY deviate to mark a variant: <code>self</code> (vault owner, <a class="secref" href="#s6">Section 6</a>) or <code>series</code> (a TV series in <code>Movies/</code>).</li>
       <li><strong>scalar fields</strong> (string) — collection-specific (<code>birthday</code>, <code>address</code>, …). Unknown scalars MUST be preserved.</li>
-      <li><strong>link blocks</strong> (<code>relations</code>, <code>places</code>, <code>people</code>) — see §5.</li>
+      <li><strong>link blocks</strong> (<code>relations</code>, <code>places</code>, <code>people</code>) — see <a class="secref" href="#s5">Section 5</a>.</li>
     </ul>
     <h4>4.2 · Bodies</h4>
     <p>Everything after the closing <code>---</code> is the notes body (Markdown). Apps SHOULD preserve it verbatim.</p>
-    <h4>4.3 · File kinds</h4>
-    <p>A collection's files are one of three kinds. All share YAML frontmatter, real YAML, lowercase slugs and Markdown bodies — they differ only in <strong>body shape</strong>, and so in how they're surfaced (§5.6):</p>
+    <h4 id="s4-3">4.3 · File kinds</h4>
+    <p>A collection's files are one of three kinds. All share YAML frontmatter, real YAML, lowercase slugs and Markdown bodies — they differ only in <strong>body shape</strong>, and so in how they're surfaced (<a class="secref" href="#s5-6">Section 5.6</a>):</p>
     <div class="tbl"><table>
       <tr><th>Kind</th><th>Frontmatter</th><th>Body</th><th>Used by</th><th>One file =</th></tr>
       <tr><td><strong>entity</strong></td><td><code>name</code>, <code>type</code>, fields, link blocks</td><td>free-text notes</td><td>People, Places, Movies, Dreams, Projects</td><td>one subject</td></tr>
@@ -189,7 +190,7 @@ Optional free-text notes go here.</code></pre>
       <tr><td><strong>log</strong></td><td><code>name</code>, <code>type</code>, <code>kind: log</code></td><td>dated <code>##</code> sections</td><td>F1, any timeline</td><td>one timeline (e.g. a season)</td></tr>
     </table></div>
     <p><code>type</code>/<code>metric</code> identify the collection. The kind is given by an optional <strong><code>kind: entity|metric|log</code></strong> field; when absent it is inferred — a file with a <code>metric:</code> key is a metric, otherwise an entity. Because an entity's notes may legitimately contain a <code>## YYYY-MM-DD</code> heading, <strong>log files MUST declare <code>kind: log</code></strong>; <code>kind</code> is optional for entity and metric files.</p>
-    <p>The <strong>journal</strong> (§3) is itself a per-date log-like file, but path-addressed by date rather than section-addressed.</p>
+    <p>The <strong>journal</strong> (<a class="secref" href="#s3">Section 3</a>) is itself a per-date log-like file, but path-addressed by date rather than section-addressed.</p>
   </section>
 
   <section id="s5">
@@ -204,29 +205,29 @@ Optional free-text notes go here.</code></pre>
     </ul>
     <p>Examples: <code>[[People/jane-doe|Jane]]</code>, <code>[[People/john-doe|John (home)]]</code>.</p>
 
-    <h4>5.2 · Link blocks (relations)</h4>
+    <h4 id="s5-2">5.2 · Link blocks (relations)</h4>
     <p>A link block is a frontmatter key whose value is a YAML <strong>list of wikilink strings</strong>. The <strong>relation label is encoded in the display</strong> (the <code>(label)</code> suffix):</p>
 <pre><code>relations:
-  - "[[People/jaswan|Jaswanth (brother)]]"
-  - "[[People/kimi|Kimi (friend)]]"
+  - "[[People/john-doe|John (brother)]]"
+  - "[[People/jane-doe|Jane (friend)]]"
 places:
-  - "[[Places/berlin|Berlin (home)]]"</code></pre>
-    <p>Defined blocks: <code>relations</code> (→ People), <code>places</code> (→ Places), <code>people</code> (→ People). Apps MAY define more. <strong>Reciprocity is a within-app convention</strong> — record the inverse on the other entity, <em>except</em> links to the <code>self</code> entity (§6), which stay one-directional to avoid an unbounded hub file. As a migration format (§0.1), an importing app just reads whatever links exist.</p>
+  - "[[Places/anytown|Anytown (home)]]"</code></pre>
+    <p>Defined blocks: <code>relations</code> (→ People), <code>places</code> (→ Places), <code>people</code> (→ People). Apps MAY define more. <strong>Reciprocity is a within-app convention</strong> — record the inverse on the other entity, <em>except</em> links to the <code>self</code> entity (<a class="secref" href="#s6">Section 6</a>), which stay one-directional to avoid an unbounded hub file. As a migration format (<a class="secref" href="#s0-1">Section 0.1</a>), an importing app just reads whatever links exist.</p>
 
-    <h4>5.3 · Mention shorthand</h4>
+    <h4 id="s5-3">5.3 · Mention shorthand</h4>
     <p>In journal/body text, <code>@&lt;slug&gt;</code> is a lightweight mention of an entity by slug (default collection: People), equivalent to a wikilink for backlink purposes.</p>
 
-    <h4>5.4 · Attachments / photos</h4>
+    <h4 id="s5-4">5.4 · Attachments / photos</h4>
     <p>Binary attachments live under <code>Photos/</code>, embedded with <strong>standard CommonMark reference-style image links</strong>:</p>
 <pre><code>![alt text][photo-1]
 
 [photo-1]: Photos/2026-06-27-river.jpg</code></pre>
     <p>Ordinary CommonMark — renders in Obsidian and any compliant engine. A reference-style image MAY be wrapped in a reference-style link (<code>[![alt][photo-1]][open-1]</code>) to make it clickable.</p>
 
-    <h4>5.5 · Transclusion (section embeds)</h4>
+    <h4 id="s5-5">5.5 · Transclusion (section embeds)</h4>
     <p>A <code>!</code>-prefixed wikilink <strong>embeds</strong> the target rather than linking to it:</p>
 <pre><code>![[&lt;Folder&gt;/&lt;file&gt;#&lt;heading&gt;]]</code></pre>
-    <p>This transcludes the section under <code>&lt;heading&gt;</code> — used to surface a <strong>log</strong> entry inside another file (notably the journal, §5.6). Example:</p>
+    <p>This transcludes the section under <code>&lt;heading&gt;</code> — used to surface a <strong>log</strong> entry inside another file (notably the journal, <a class="secref" href="#s5-6">Section 5.6</a>). Example:</p>
 <pre><code>![[F1/2026-season#2026-06-29 — Austin Grand Prix]]</code></pre>
     <ul>
       <li>The anchor is the <strong>heading text</strong>, so headings must be unique; date-led headings (<code>## YYYY-MM-DD — Title</code>) are naturally unique and are <strong>REQUIRED</strong> for log sections. If a heading changes, the writing app MUST rewrite the journal embed (rewrite-on-rename). A future version MAY anchor on a stable block id.</li>
@@ -234,13 +235,13 @@ places:
       <li>An embed is also a backlink: "open the Austin entry → see it was embedded in the 2026-06-29 journal."</li>
     </ul>
 
-    <h4>5.6 · Surfacing dated entries in the journal (the timeline)</h4>
+    <h4 id="s5-6">5.6 · Surfacing dated entries in the journal (the timeline)</h4>
     <p>An app MAY make an entry logged in another collection on date <em>D</em> appear in <em>D</em>'s journal, turning the journal into a timeline of the day. Two mechanisms, chosen by the source file's kind:</p>
     <ul>
-      <li><strong>Log entry → embed.</strong> Append a dated <code>##</code> section to the log file and write a section embed (§5.5) into <em>D</em>'s journal. <strong>Live</strong> (renders the current section) and <strong>portable</strong> (Obsidian transcludes it).</li>
+      <li><strong>Log entry → embed.</strong> Append a dated <code>##</code> section to the log file and write a section embed (<a class="secref" href="#s5-5">Section 5.5</a>) into <em>D</em>'s journal. <strong>Live</strong> (renders the current section) and <strong>portable</strong> (Obsidian transcludes it).</li>
       <li><strong>Metric reading → snapshot line.</strong> A table row can't be section-embedded, so append the row to the metric table <em>and</em> write a plain-text <strong>snapshot</strong> line into the journal, e.g. <code>Weight — 167 lb</code>. A <strong>point-in-time</strong> record, portable as ordinary Markdown; an app MAY additionally render the live value from the table.</li>
     </ul>
-    <p>Both are ordinary backlinks (§5.2), navigable in both directions. See Appendix D for worked examples.</p>
+    <p>Both are ordinary backlinks (<a class="secref" href="#s5-2">Section 5.2</a>), navigable in both directions. See Appendix D for worked examples.</p>
   </section>
 
   <section id="s6">
@@ -249,7 +250,7 @@ places:
       <li>Exactly <strong>one</strong> <code>People/&lt;slug&gt;.md</code> carries <code>type: self</code> — the vault owner.</li>
       <li><code>orma_settings.json</code> → <code>user.person_slug</code> is the <strong>authoritative pointer</strong>; <code>user.person_name</code> is the display name.</li>
       <li>Recovery: if the pointer is missing, an app MAY scan <code>People/</code> for the single <code>type: self</code> file and repair the pointer.</li>
-      <li>The self file MUST NOT accumulate auto-generated reverse links (§5.2).</li>
+      <li>The self file MUST NOT accumulate auto-generated reverse links (<a class="secref" href="#s5-2">Section 5.2</a>).</li>
     </ul>
   </section>
 
@@ -263,7 +264,7 @@ places:
   "nav_order": ["&lt;app_id&gt;", "..."]
 }</code></pre>
     <ul>
-      <li><code>omf_version</code> (string, required) — the OMF version the vault conforms to (§8).</li>
+      <li><code>omf_version</code> (string, required) — the OMF version the vault conforms to (<a class="secref" href="#s8">Section 8</a>).</li>
       <li><code>user</code> — identity, <strong>core to OMF</strong>.</li>
       <li><code>apps</code>, <code>nav_order</code> — UI/app state; apps MUST preserve keys they don't understand.</li>
     </ul>
@@ -278,12 +279,12 @@ places:
     <h2><span class="num">9</span>Resolved decisions (0.1)</h2>
     <ul>
       <li><strong>Strict YAML</strong> — frontmatter MUST be valid YAML 1.x.</li>
-      <li><strong>Slugs are lowercase</strong> — writers MUST emit lowercase slugs (§2).</li>
-      <li><strong>Attachments are standard CommonMark</strong> reference-style image links (§5.4).</li>
-      <li><strong>Concurrency is out of scope</strong> (§0.1) — migration format; no merge/conflict semantics.</li>
-      <li><strong><code>omf_version</code></strong> is a required settings field (§7–8).</li>
-      <li><strong>File kinds</strong> (§4.3) — entity / metric / log, with an optional <code>kind:</code> field; log files MUST declare <code>kind: log</code>.</li>
-      <li><strong>Embed anchors</strong> (§5.5) — date-led log headings; apps rewrite journal embeds on heading change.</li>
+      <li><strong>Slugs are lowercase</strong> — writers MUST emit lowercase slugs (<a class="secref" href="#s2">Section 2</a>).</li>
+      <li><strong>Attachments are standard CommonMark</strong> reference-style image links (<a class="secref" href="#s5-4">Section 5.4</a>).</li>
+      <li><strong>Concurrency is out of scope</strong> (<a class="secref" href="#s0-1">Section 0.1</a>) — migration format; no merge/conflict semantics.</li>
+      <li><strong><code>omf_version</code></strong> is a required settings field (<a class="secref" href="#s7">Section 7</a>–8).</li>
+      <li><strong>File kinds</strong> (<a class="secref" href="#s4-3">Section 4.3</a>) — entity / metric / log, with an optional <code>kind:</code> field; log files MUST declare <code>kind: log</code>.</li>
+      <li><strong>Embed anchors</strong> (<a class="secref" href="#s5-5">Section 5.5</a>) — date-led log headings; apps rewrite journal embeds on heading change.</li>
     </ul>
   </section>
 
@@ -307,9 +308,9 @@ places:
   <section id="a">
     <p class="appendix-tag">Appendix A</p>
     <h2 class="plain">Apps &amp; collections</h2>
-    <p>OMF is organized into <strong>collections</strong> — a top-level folder of files of one kind (§4.3). An <strong>app</strong> is a module that owns a collection: it defines the folder, the <code>type</code>/<code>kind</code>, and the field set, and provides the UI. Collections are the <strong>extension point</strong> — new apps add new folders without changing the format.</p>
+    <p>OMF is organized into <strong>collections</strong> — a top-level folder of files of one kind (<a class="secref" href="#s4-3">Section 4.3</a>). An <strong>app</strong> is a module that owns a collection: it defines the folder, the <code>type</code>/<code>kind</code>, and the field set, and provides the UI. Collections are the <strong>extension point</strong> — new apps add new folders without changing the format.</p>
     <ul>
-      <li><code>orma_settings.json</code> → <code>apps</code> records per-app <em>enabled</em> state by <code>app_id</code>; <code>nav_order</code> records display order. A reader that doesn't know an <code>app_id</code> MUST preserve it (§7).</li>
+      <li><code>orma_settings.json</code> → <code>apps</code> records per-app <em>enabled</em> state by <code>app_id</code>; <code>nav_order</code> records display order. A reader that doesn't know an <code>app_id</code> MUST preserve it (<a class="secref" href="#s7">Section 7</a>).</li>
       <li>An app encountering a <strong>folder it doesn't recognize</strong> MUST leave it untouched — this is what lets two OMF apps with different feature sets share a vault.</li>
     </ul>
     <p>A collection is <em>self-describing enough to migrate</em> when its files carry <code>name</code> + <code>type</code> (entities), a documented tabular shape (metric), or <code>kind: log</code> (log). An importing app can always fall back to <code>name</code> + <code>type</code> + raw frontmatter + Markdown body.</p>
@@ -318,14 +319,14 @@ places:
   <section id="b">
     <p class="appendix-tag">Appendix B</p>
     <h2 class="plain">Built-in collection reference</h2>
-    <p>Dates are ISO 8601 <code>YYYY-MM-DD</code>. "block" = a link block (§5.2). All fields other than <code>name</code>/<code>type</code> are OPTIONAL. Unknown fields MUST be preserved.</p>
+    <p>Dates are ISO 8601 <code>YYYY-MM-DD</code>. "block" = a link block (<a class="secref" href="#s5-2">Section 5.2</a>). All fields other than <code>name</code>/<code>type</code> are OPTIONAL. Unknown fields MUST be preserved.</p>
 
     <h3>Journals · <code>Journals/</code></h3>
     <ul>
       <li><strong>File:</strong> <code>Journals/YYYY/MM/YYYY-MM-DD.md</code> (flat accepted on read).</li>
       <li><strong>No frontmatter.</strong> The date is the filename.</li>
       <li>Optional leading <code># Heading</code> = title; the rest is the body.</li>
-      <li>Body may contain wikilinks, <code>@slug</code> mentions, image attachments (§5.4), and journal-surfacing embeds / snapshots (§5.6).</li>
+      <li>Body may contain wikilinks, <code>@slug</code> mentions, image attachments (<a class="secref" href="#s5-4">Section 5.4</a>), and journal-surfacing embeds / snapshots (<a class="secref" href="#s5-6">Section 5.6</a>).</li>
     </ul>
 
     <h3>People · <code>People/</code> — <code>type: person</code> (or <code>self</code>)</h3>
@@ -404,7 +405,7 @@ unit: kg
       <li><strong>File:</strong> <code>Health/&lt;metric-slug&gt;.md</code>.</li>
       <li>Frontmatter: <code>metric</code> (string), <code>unit</code> (default unit).</li>
       <li>Body: a Markdown table — header row, then one row per reading. Rows whose first cell isn't an ISO date are ignored.</li>
-      <li><strong>Journal surfacing:</strong> a reading is mirrored into its date's journal as a snapshot line (§5.6, Appendix D). The table stays the source of truth for charts.</li>
+      <li><strong>Journal surfacing:</strong> a reading is mirrored into its date's journal as a snapshot line (<a class="secref" href="#s5-6">Section 5.6</a>, Appendix D). The table stays the source of truth for charts.</li>
     </ul>
 
     <h3>Logs · e.g. <code>F1/</code> — <strong>log</strong> kind (dated sections)</h3>
@@ -424,7 +425,7 @@ Wet start, three safety cars. Leclerc won from P4.</code></pre>
       <li><strong>File:</strong> <code>&lt;Collection&gt;/&lt;slug&gt;.md</code> (e.g. <code>F1/2026-season.md</code>).</li>
       <li>Frontmatter: <code>name</code>, <code>type</code>, <code>kind: log</code> (required).</li>
       <li>Body: sections headed <code>## YYYY-MM-DD — Title</code> (date-led for stable, unique anchors); section body is free Markdown.</li>
-      <li><strong>Journal surfacing:</strong> an entry is embedded into its date's journal via a section transclusion (§5.5, Appendix D).</li>
+      <li><strong>Journal surfacing:</strong> an entry is embedded into its date's journal via a section transclusion (<a class="secref" href="#s5-5">Section 5.5</a>, Appendix D).</li>
     </ul>
   </section>
 
@@ -435,7 +436,7 @@ Wet start, three safety cars. Leclerc won from P4.</code></pre>
     <ol class="spec">
       <li>Read <code>orma_settings.json</code> for <code>omf_version</code> and the <code>user</code> identity.</li>
       <li>Enumerate top-level folders. For each known collection, list <code>*.md</code> files.</li>
-      <li>Parse each file: split the leading <code>---…---</code> frontmatter (valid YAML) from the body. Slug = filename without <code>.md</code>. Determine kind (§4.3).</li>
+      <li>Parse each file: split the leading <code>---…---</code> frontmatter (valid YAML) from the body. Slug = filename without <code>.md</code>. Determine kind (<a class="secref" href="#s4-3">Section 4.3</a>).</li>
       <li>Resolve <code>[[Folder/slug|Display]]</code> wikilinks and <code>![[file#heading]]</code> embeds; treat <code>@slug</code> as a People mention; render attachments from <code>Photos/</code>.</li>
       <li>For an unknown collection, fall back to <code>name</code> + <code>type</code> + raw frontmatter + body, and preserve the files unchanged.</li>
     </ol>
