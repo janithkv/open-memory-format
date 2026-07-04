@@ -21,7 +21,7 @@ A vault is portable by construction: it is just files in a folder, in any
 storage the user controls (local disk, Google Drive, Dropbox, …). Any app that
 follows this spec can read and write the same vault.
 
-Files come in three **kinds** (§4.3): **entity** (one subject per file),
+Files come in three **kinds** ([Section 4.3](#43-file-kinds)): **entity** (one subject per file),
 **metric** (a dated numeric table), and **log** (a timeline of dated sections).
 All three are plain Markdown with YAML frontmatter; they differ only in body
 shape.
@@ -50,10 +50,10 @@ portable, without the complexity of real-time co-editing.
   Movies/<slug>.md
   Health/…                  # app-defined sub-layout
   Photos/                   # binary attachments (images, …)
-  orma_settings.json        # vault settings + identity (see §6)
+  orma_settings.json        # vault settings + identity (see Section 6)
 ```
 
-- Top-level folder name = the **entity collection** (singular `type` in §4).
+- Top-level folder name = the **entity collection** (singular `type` in [Section 4](#4-entity-files)).
 - One entity per file; the file's **slug** (filename without `.md`) is its
   identity within the collection.
 - Folders an app doesn't recognize MUST be preserved untouched (forward-compat).
@@ -108,11 +108,11 @@ Optional free-text notes go here.
 - **`type`** (string, required) — the entity type. The **folder is the primary
   type** (`People`→`person`, `Places`→`place`, …). `type` MAY deviate to mark a
   variant within a folder:
-  - `self` — the user's own person (exactly one per vault; see §6).
+  - `self` — the user's own person (exactly one per vault; see [Section 6](#6-identity-the-self)).
   - `series` — a TV series in `Movies/` (vs. the default `movie`).
 - **scalar fields** (string) — app/collection-specific, e.g. `birthday`,
   `address`, `kind`, `city`. Unknown scalars MUST be preserved.
-- **link blocks** (`relations`, `places`, `people`) — see §5.
+- **link blocks** (`relations`, `places`, `people`) — see [Section 5](#5-links).
 
 ### 4.2 Bodies
 
@@ -123,7 +123,7 @@ preserve it verbatim.
 
 A collection's files are one of three kinds. All share YAML frontmatter, real
 YAML, lowercase slugs, and Markdown bodies — they differ only in **body shape**
-and so in how they're surfaced (§5.6):
+and so in how they're surfaced ([Section 5.6](#56-surfacing-dated-entries-in-the-journal-the-timeline)):
 
 | Kind | Frontmatter | Body | Used by | One file = |
 |---|---|---|---|---|
@@ -138,7 +138,7 @@ entity's notes may legitimately contain a `## YYYY-MM-DD` heading, **log files
 MUST declare `kind: log`** (it cannot be safely inferred); `kind` is optional for
 entity and metric files.
 
-The **journal** (§3) is itself a per-date log-like file, but path-addressed by
+The **journal** ([Section 3](#3-journal-entries)) is itself a per-date log-like file, but path-addressed by
 date rather than section-addressed.
 
 ## 5. Links
@@ -163,10 +163,10 @@ strings**. The **relation label is encoded in the wikilink display** (the
 
 ```yaml
 relations:
-  - "[[People/jaswan|Jaswanth (brother)]]"
-  - "[[People/kimi|Kimi (friend)]]"
+  - "[[People/john-doe|John (brother)]]"
+  - "[[People/jane-doe|Jane (friend)]]"
 places:
-  - "[[Places/berlin|Berlin (home)]]"
+  - "[[Places/anytown|Anytown (home)]]"
 ```
 
 Defined blocks: `relations` (→ People), `places` (→ Places), `people`
@@ -174,8 +174,8 @@ Defined blocks: `relations` (→ People), `places` (→ Places), `people`
 
 **Reciprocity is a within-app convention:** when an app records "X relates to
 Y", it SHOULD also record the inverse on Y — *except* links to the `self` entity
-(§6), which are intentionally one-directional to avoid an unbounded hub file.
-Because OMF is a migration format (§0.1), an importing app simply reads whatever
+([Section 6](#6-identity-the-self)), which are intentionally one-directional to avoid an unbounded hub file.
+Because OMF is a migration format ([Section 0.1](#01-scope--non-goals)), an importing app simply reads whatever
 links exist; it need not reconcile or merge them.
 
 ### 5.3 Mention shorthand
@@ -211,8 +211,8 @@ A `!`-prefixed wikilink **embeds** the target rather than linking to it:
 ```
 
 This transcludes the section under `<heading>` from `<Folder>/<file>.md` — used
-to surface a **log** entry (§4.3) inside another file (notably the journal,
-§5.6). Example, embedding one race from a season log:
+to surface a **log** entry ([Section 4.3](#43-file-kinds)) inside another file (notably the journal,
+[Section 5.6](#56-surfacing-dated-entries-in-the-journal-the-timeline)). Example, embedding one race from a season log:
 
 ```
 ![[F1/2026-season#2026-06-29 — Austin Grand Prix]]
@@ -234,10 +234,10 @@ to surface a **log** entry (§4.3) inside another file (notably the journal,
 
 An app MAY make an entry logged in another collection on date *D* appear in
 *D*'s journal, turning the journal into a timeline of the day. There are two
-mechanisms, chosen by the source file's kind (§4.3):
+mechanisms, chosen by the source file's kind ([Section 4.3](#43-file-kinds)):
 
 - **Log entry → embed.** Append a dated `##` section to the log file and write a
-  section embed (§5.5) into *D*'s journal. This is **live** (renders the current
+  section embed ([Section 5.5](#55-transclusion-section-embeds)) into *D*'s journal. This is **live** (renders the current
   section) and **portable** (Obsidian transcludes it).
 - **Metric reading → snapshot line.** A table row can't be section-embedded, so
   append the row to the metric table *and* write a plain-text **snapshot** line
@@ -245,7 +245,7 @@ mechanisms, chosen by the source file's kind (§4.3):
   portable as ordinary Markdown. An app MAY additionally render the live value
   from the source table.
 
-Both are ordinary backlinks (§5.2), so the relationship is navigable in both
+Both are ordinary backlinks ([Section 5.2](#52-link-blocks-relations)), so the relationship is navigable in both
 directions. See Appendix D for worked examples.
 
 ## 6. Identity (the "self")
@@ -255,7 +255,7 @@ directions. See Appendix D for worked examples.
   that slug; `user.person_name` is the display name.
 - Recovery: if the pointer is missing, an app MAY scan `People/` for the single
   `type: self` file and repair the pointer.
-- The self file MUST NOT accumulate auto-generated reverse links (§5.2).
+- The self file MUST NOT accumulate auto-generated reverse links ([Section 5.2](#52-link-blocks-relations)).
 
 ## 7. Settings file
 
@@ -270,7 +270,7 @@ directions. See Appendix D for worked examples.
 }
 ```
 
-- `omf_version` (string, required) — the OMF version the vault conforms to (§8).
+- `omf_version` (string, required) — the OMF version the vault conforms to ([Section 8](#8-versioning)).
 - `user` — identity, **core to OMF**.
 - `apps`, `nav_order` — UI/app state; OMF-aware but app-specific. Apps MUST
   preserve keys they don't understand.
@@ -284,15 +284,15 @@ detect compatibility. Absence is treated as the earliest version (`0.1`).
 ## 9. Resolved decisions (0.1)
 
 - **Strict YAML** — frontmatter MUST be valid YAML 1.x.
-- **Slugs are lowercase** — writers MUST emit lowercase slugs (§2).
-- **Attachments are standard CommonMark** reference-style image links (§5.4) —
+- **Slugs are lowercase** — writers MUST emit lowercase slugs ([Section 2](#2-slugs)).
+- **Attachments are standard CommonMark** reference-style image links ([Section 5.4](#54-attachments--photos)) —
   no OMF-specific embed grammar.
-- **Concurrency is out of scope** (§0.1) — OMF is a migration format; no
+- **Concurrency is out of scope** ([Section 0.1](#01-scope--non-goals)) — OMF is a migration format; no
   merge/conflict semantics. Reciprocity is a within-app convention.
-- **`omf_version`** is a required settings field (§7–8).
-- **File kinds** (§4.3) — entity / metric / log, with an optional `kind:` field;
+- **`omf_version`** is a required settings field ([Section 7](#7-settings-file)–8).
+- **File kinds** ([Section 4.3](#43-file-kinds)) — entity / metric / log, with an optional `kind:` field;
   log files MUST declare `kind: log`.
-- **Embed anchors** (§5.5) — date-led log headings; apps rewrite journal embeds
+- **Embed anchors** ([Section 5.5](#55-transclusion-section-embeds)) — date-led log headings; apps rewrite journal embeds
   on heading change.
 
 ## 10. Open questions (still to settle before 1.0)
@@ -326,7 +326,7 @@ folders without changing the format.
 - The built-in collections are listed in Appendix B.
 - `orma_settings.json` → `apps` records per-app *enabled* state by `app_id`;
   `nav_order` records their display order. These are app/UI hints; a reader that
-  doesn't know an `app_id` MUST preserve it (§7).
+  doesn't know an `app_id` MUST preserve it ([Section 7](#7-settings-file)).
 - An app encountering a **folder it doesn't recognize** MUST leave it untouched.
   This is what lets two OMF apps with different feature sets share a vault: each
   reads the collections it understands and preserves the rest.
@@ -340,7 +340,7 @@ Markdown body even if it doesn't model that collection.
 
 # Appendix B — Built-in collection reference
 
-Dates are ISO 8601 `YYYY-MM-DD`. "block" = a link block (§5.2). All fields other
+Dates are ISO 8601 `YYYY-MM-DD`. "block" = a link block ([Section 5.2](#52-link-blocks-relations)). All fields other
 than `name`/`type` are OPTIONAL. Unknown fields MUST be preserved.
 
 ## Journals (`Journals/`)
@@ -348,10 +348,10 @@ than `name`/`type` are OPTIONAL. Unknown fields MUST be preserved.
 - **File:** `Journals/YYYY/MM/YYYY-MM-DD.md` (flat `YYYY-MM-DD.md` accepted on read).
 - **No frontmatter.** The date is the filename.
 - Optional leading `# Heading` = the entry title; the rest is the body (Markdown).
-- Body may contain `[[Folder/slug|…]]` wikilinks, `@slug` mentions (§5.3), and
-  CommonMark image embeds for attachments (§5.4).
+- Body may contain `[[Folder/slug|…]]` wikilinks, `@slug` mentions ([Section 5.3](#53-mention-shorthand)), and
+  CommonMark image embeds for attachments ([Section 5.4](#54-attachments--photos)).
 
-## People (`People/`) — `type: person` (or `self`, §6)
+## People (`People/`) — `type: person` (or `self`, [Section 6](#6-identity-the-self))
 
 | field | kind | meaning |
 |---|---|---|
@@ -434,7 +434,7 @@ unit: kg
   (`date`, `value`, `unit`, `notes`). Rows whose first cell isn't an ISO date
   are ignored.
 - **Journal surfacing:** a reading is mirrored into its date's journal as a
-  snapshot line (§5.6, Appendix D). The table stays the source of truth for
+  snapshot line ([Section 5.6](#56-surfacing-dated-entries-in-the-journal-the-timeline), Appendix D). The table stays the source of truth for
   charts; the journal line is a point-in-time record.
 
 ## Logs (e.g. `F1/`) — **log** kind (dated sections)
@@ -461,7 +461,7 @@ Wet start, three safety cars. Leclerc won from P4.
 - Body: zero or more sections, each headed `## YYYY-MM-DD — Title` (date-led for
   stable, unique anchors). The section body is free Markdown.
 - **Journal surfacing:** an entry is embedded into its date's journal via a
-  section transclusion (§5.5, Appendix D), so it renders inline there and in
+  section transclusion ([Section 5.5](#55-transclusion-section-embeds), Appendix D), so it renders inline there and in
   Obsidian.
 
 ---
