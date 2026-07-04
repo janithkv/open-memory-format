@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Open Memory Format — a plain-files format for a life's memories</title>
+<meta name="description" content="OMF is an open, plain-Markdown vault format for journals, people, places and more — human-readable files you own forever, that any app can read and write." />
+<meta property="og:title" content="Open Memory Format (OMF)" />
+<meta property="og:description" content="Your memories, in files you own. An open Markdown vault format any app can read and write." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#F2F0E9; --surface:#FFFFFF; --ink:#241139; --muted:#8a8175;
+    --accent:#8F45AD; --plum:#371C56; --border:#E0DDD6; --border-light:#F0EDE6;
+    --accent-tint:rgba(143,69,173,.07); --code-bg:#FBFAF7;
+    --serif:'Newsreader', Georgia, 'Times New Roman', serif;
+    --sans:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:16.5px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  .wrap { max-width:900px; margin:0 auto; padding:0 24px; }
+
+  /* Masthead */
+  header.hero { padding:88px 0 64px; }
+  .eyebrow { font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0 0 20px; }
+  h1 { font-family:var(--serif); font-weight:500; font-size:clamp(42px,7.5vw,72px); line-height:1.0; letter-spacing:-.015em; margin:0 0 22px; max-width:16ch; }
+  .lede { font-family:var(--serif); font-size:clamp(19px,2.4vw,23px); color:#4a4458; margin:0 0 32px; max-width:56ch; line-height:1.5; }
+  .cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .btn { display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-size:15px; font-weight:500; padding:12px 22px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--ink); transition:transform .12s ease, box-shadow .12s ease; }
+  .btn:hover { text-decoration:none; transform:translateY(-1px); box-shadow:0 6px 20px rgba(55,28,86,.10); }
+  .btn.primary { background:var(--plum); color:#fff; border-color:var(--plum); }
+  .btn.primary:hover { box-shadow:0 8px 26px rgba(55,28,86,.28); }
+  .badges { display:flex; gap:9px; flex-wrap:wrap; margin-top:26px; }
+  .badge { font-size:12.5px; font-weight:500; padding:5px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:#5a5266; }
+  .badge.draft { color:var(--accent); border-color:rgba(143,69,173,.3); background:var(--accent-tint); }
+
+  /* Sections */
+  section { padding:16px 0; }
+  .sec-label { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-weight:600; margin:0 0 24px; }
+  h2 { font-family:var(--serif); font-weight:500; font-size:clamp(26px,4vw,34px); letter-spacing:-.01em; margin:0 0 16px; }
+
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:8px 0 24px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:26px 24px; }
+  .card h3 { font-family:var(--serif); font-weight:600; font-size:20px; margin:0 0 8px; }
+  .card p { margin:0; font-size:15px; color:#4a4458; }
+  .card .mark { font-size:22px; margin:0 0 14px; display:block; }
+
+  /* Code sample */
+  .sample { display:grid; grid-template-columns:1.05fr 1fr; gap:28px; align-items:center; margin:16px 0 8px; }
+  .sample .prose p { margin:0 0 14px; color:#4a4458; }
+  figure.code { margin:0; background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+  figure.code figcaption { font-family:var(--mono); font-size:12.5px; color:var(--muted); padding:12px 18px; border-bottom:1px solid var(--border-light); background:var(--code-bg); }
+  pre { margin:0; padding:20px 18px; overflow-x:auto; }
+  code { font-family:var(--mono); font-size:13.5px; line-height:1.7; color:#3a3348; }
+  .tok-key { color:var(--accent); }
+  .tok-link { color:var(--plum); font-weight:500; }
+  .tok-comment { color:var(--muted); }
+
+  ul.builton { list-style:none; padding:0; margin:8px 0 0; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  ul.builton li { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 20px; }
+  ul.builton strong { font-family:var(--mono); font-size:14px; color:var(--ink); display:block; margin-bottom:5px; }
+  ul.builton span { font-size:14px; color:#4a4458; }
+
+  .links { display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin-top:8px; }
+  .linkrow { display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px 22px; }
+  .linkrow:hover { text-decoration:none; border-color:rgba(143,69,173,.35); }
+  .linkrow .t { font-weight:600; color:var(--ink); font-size:15.5px; }
+  .linkrow .d { font-size:13.5px; color:var(--muted); margin-top:2px; }
+  .linkrow .arrow { color:var(--accent); font-size:18px; }
+  .soon { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border:1px solid var(--border); border-radius:999px; padding:3px 9px; }
+
+  hr.rule { border:0; border-top:1px solid var(--border); margin:64px 0; }
+  footer { padding:40px 0 100px; color:var(--muted); font-size:14px; }
+  footer a { color:#5a5266; }
+  footer p { margin:0 0 8px; }
+
+  @media (max-width:760px) {
+    .grid, ul.builton, .links { grid-template-columns:1fr; }
+    .sample { grid-template-columns:1fr; }
+    header.hero { padding:64px 0 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">Open Memory Format</p>
+    <h1>Your memories, in files you own.</h1>
+    <p class="lede">
+      OMF is an open format for a life's record — journals, people, places,
+      projects and more — stored as plain Markdown files in a folder you control.
+      Human-readable, app-agnostic, yours forever.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="spec/0.1/">Read the 0.1 spec →</a>
+      <a class="btn" href="https://github.com/janithkv/open-memory-format">View on GitHub</a>
+    </div>
+    <div class="badges">
+      <span class="badge draft">0.1 · Draft</span>
+      <span class="badge">CommonMark + YAML</span>
+      <span class="badge">CC-BY-4.0</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="grid">
+      <div class="card">
+        <span class="mark">📄</span>
+        <h3>Plain files</h3>
+        <p>A vault is just a folder of Markdown and a little JSON. No database, no
+           lock-in, no proprietary blob. Back it up, grep it, edit it in any editor.</p>
+      </div>
+      <div class="card">
+        <span class="mark">👁</span>
+        <h3>Human-readable</h3>
+        <p>Open any file and it reads like a note, not a data dump. YAML fields on
+           top, your words below. Legible in fifty years.</p>
+      </div>
+      <div class="card">
+        <span class="mark">🔗</span>
+        <h3>App-agnostic</h3>
+        <p>Any app that follows the spec can read and write the same vault. Move
+           between apps — or take your data and leave — without an export step.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <p class="sec-label">What a file looks like</p>
+    <div class="sample">
+      <div class="prose">
+        <h2>A journal entry is a Markdown file.</h2>
+        <p>The date lives in the filename. An optional <code>#&nbsp;heading</code>
+           is the title; everything after is the body.</p>
+        <p><code>[[wikilinks]]</code> connect entries to people, places and
+           projects — the same links Obsidian understands.</p>
+      </div>
+      <figure class="code">
+        <figcaption>Journals/2026/07/2026-07-03.md</figcaption>
+<pre><code># A good day
+
+Had coffee with <span class="tok-link">[[People/jane-doe|@Jane]]</span>.
+Started planning <span class="tok-link">[[Projects/learn-piano]]</span>. Felt @grateful.</code></pre>
+      </figure>
+    </div>
+    <div class="sample" style="margin-top:28px;">
+      <figure class="code">
+        <figcaption>People/jane-doe.md</figcaption>
+<pre><code><span class="tok-comment">---</span>
+<span class="tok-key">type:</span> person
+<span class="tok-key">relation:</span> friend
+<span class="tok-key">home:</span> <span class="tok-link">[[Places/anytown]]</span>
+<span class="tok-comment">---</span>
+
+A placeholder person, here to show the entity-file shape.</code></pre>
+      </figure>
+      <div class="prose">
+        <h2>Everything else is an entity.</h2>
+        <p>One subject per file: a person, a place, a project. Structured fields go
+           in YAML frontmatter; free notes go in the body.</p>
+        <p>Files come in three kinds — <strong>entity</strong>,
+           <strong>metric</strong> (a dated table) and <strong>log</strong>
+           (a timeline) — all plain Markdown underneath.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <p class="sec-label">Built on what you already know</p>
+    <h2>Not a new syntax — a profile of three familiar ones.</h2>
+    <ul class="builton">
+      <li><strong>CommonMark</strong><span>Standard Markdown for every file body. Nothing bespoke to parse.</span></li>
+      <li><strong>YAML</strong><span>Frontmatter for structured fields — strict YAML 1.x, valid everywhere.</span></li>
+      <li><strong>[[wikilinks]]</strong><span>Obsidian-compatible links &amp; embeds for cross-references.</span></li>
+    </ul>
+  </section>
+
+  <hr class="rule" />
+
+  <section>
+    <p class="sec-label">Explore</p>
+    <div class="links">
+      <a class="linkrow" href="spec/0.1/">
+        <span><span class="t">The 0.1 specification</span><div class="d">The full format, section by section</div></span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="linkrow" href="https://github.com/janithkv/open-memory-format/tree/main/example-vault">
+        <span><span class="t">Example vault</span><div class="d">A small, real, conformant vault to read</div></span>
+        <span class="arrow">→</span>
+      </a>
+      <a class="linkrow" href="https://github.com/janithkv/open-memory-format">
+        <span><span class="t">Source &amp; issues</span><div class="d">Discuss the open questions on the way to 1.0</div></span>
+        <span class="arrow">→</span>
+      </a>
+      <div class="linkrow" style="cursor:default;">
+        <span><span class="t">Validator &amp; reference parser</span><div class="d">Conformance tooling, planned for 1.0</div></span>
+        <span class="soon">Soon</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="rule" />
+
+  <footer>
+    <p><strong>Status: draft / unstable.</strong> 0.1 documents the format as
+       currently implemented and flags the decisions still to settle before a
+       stable 1.0. Don't treat 0.x as a stability guarantee.</p>
+    <p>Spec text licensed <a href="https://github.com/janithkv/open-memory-format/blob/main/LICENSE">CC-BY-4.0</a>.
+       Tooling under <a href="https://github.com/janithkv/open-memory-format/blob/main/LICENSE-CODE">Apache-2.0</a>.
+       Implementing OMF requires no permission.</p>
+  </footer>
+
+</div>
+</body>
+</html>
