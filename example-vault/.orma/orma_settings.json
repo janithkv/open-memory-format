@@ -1,0 +1,10 @@
+{
+  "omf_version": "0.2",
+  "user": { "person_slug": "jordan-doe", "person_name": "Jordan" },
+  "apps": {
+    "app_notes": { "enabled": true },
+    "app_people": { "enabled": true },
+    "app_places": { "enabled": true }
+  },
+  "nav_order": ["app_notes", "app_people", "app_places"]
+}

@@ -99,16 +99,16 @@
     <p class="eyebrow">Open Memory Format</p>
     <h1>Your memories, in files you own.</h1>
     <p class="lede">
-      OMF is an open format for a life's record — journals, people, places,
-      projects and more — stored as plain Markdown files in a folder you control.
+      OMF is an open format for a life's record — journal days, notes, and the
+      people and places in them — stored as plain Markdown files in a folder you control.
       Human-readable, app-agnostic, yours forever.
     </p>
     <div class="cta">
-      <a class="btn primary" href="spec/0.1/">Read the 0.1 spec →</a>
+      <a class="btn primary" href="spec/0.2/">Read the 0.2 spec →</a>
       <a class="btn" href="https://github.com/orma-day/orma-community">View on GitHub</a>
     </div>
     <div class="badges">
-      <span class="badge draft">0.1 · Draft</span>
+      <span class="badge draft">0.2 · Draft</span>
       <span class="badge">CommonMark + YAML</span>
       <span class="badge">CC-BY-4.0</span>
     </div>
@@ -146,36 +146,40 @@
         <h2>A journal entry is a Markdown file.</h2>
         <p>The date lives in the filename. An optional <code>#&nbsp;heading</code>
            is the title; everything after is the body.</p>
-        <p><code>[[wikilinks]]</code> connect entries to people, places and
-           projects — the same links Obsidian understands.</p>
+        <p><code>[[wikilinks]]</code> connect a day to the people and places in
+           it, and <code>#tags</code> group days and notes — the same syntax
+           Obsidian understands.</p>
       </div>
       <figure class="code">
         <figcaption>Journals/2026/07/2026-07-03.md</figcaption>
 <pre><code># A good day
 
-Coffee with <span class="tok-link">[[People/jane-doe|@Jane]]</span>.
-Planning <span class="tok-link">[[Projects/learn-piano]]</span>.
-Felt @grateful.</code></pre>
+Coffee with <span class="tok-link">[[People/jane-doe|@jane-doe]]</span>.
+Felt grateful. #grateful
+
+## Evening
+
+A walk around <span class="tok-link">[[Places/anytown|Anytown]]</span>.</code></pre>
       </figure>
     </div>
     <div class="sample" style="margin-top:28px;">
       <figure class="code">
         <figcaption>People/jane-doe.md</figcaption>
 <pre><code><span class="tok-comment">---</span>
+<span class="tok-key">name:</span> Jane Doe
 <span class="tok-key">type:</span> person
-<span class="tok-key">relation:</span> friend
-<span class="tok-key">home:</span> <span class="tok-link">[[Places/anytown]]</span>
+<span class="tok-key">places:</span>
+  - <span class="tok-link">"[[Places/anytown|Anytown (home)]]"</span>
 <span class="tok-comment">---</span>
 
-A placeholder person, to show the entity shape.</code></pre>
+A placeholder person. #friends</code></pre>
       </figure>
       <div class="prose">
-        <h2>Everything else is an entity.</h2>
-        <p>One subject per file: a person, a place, a project. Structured fields go
-           in YAML frontmatter; free notes go in the body.</p>
-        <p>Files come in three kinds — <strong>entity</strong>,
-           <strong>metric</strong> (a dated table) and <strong>log</strong>
-           (a timeline) — all plain Markdown underneath.</p>
+        <h2>People and places are files too.</h2>
+        <p>One person or place per file. Structured fields go in YAML
+           frontmatter; free notes go in the body.</p>
+        <p>A link's label, like <code>(home)</code>, says how the two are
+           related, and the other file links back.</p>
       </div>
     </div>
   </section>
@@ -187,7 +191,7 @@ A placeholder person, to show the entity shape.</code></pre>
     <h2>Not a new syntax — a profile of three familiar ones.</h2>
     <ul class="builton">
       <li><strong>CommonMark</strong><span>Standard Markdown for every file body. Nothing bespoke to parse.</span></li>
-      <li><strong>YAML</strong><span>Frontmatter for structured fields — strict YAML 1.x, valid everywhere.</span></li>
+      <li><strong>YAML</strong><span>Frontmatter for structured fields — strict YAML, valid everywhere.</span></li>
       <li><strong>[[wikilinks]]</strong><span>Obsidian-compatible links &amp; embeds for cross-references.</span></li>
     </ul>
   </section>
@@ -197,8 +201,8 @@ A placeholder person, to show the entity shape.</code></pre>
   <section>
     <p class="sec-label">Explore</p>
     <div class="links">
-      <a class="linkrow" href="spec/0.1/">
-        <span><span class="t">The 0.1 specification</span><div class="d">The full format, section by section</div></span>
+      <a class="linkrow" href="spec/0.2/">
+        <span><span class="t">The 0.2 specification</span><div class="d">The full format, section by section</div></span>
         <span class="arrow">→</span>
       </a>
       <a class="linkrow" href="https://github.com/orma-day/orma-community/tree/main/example-vault">
@@ -219,9 +223,9 @@ A placeholder person, to show the entity shape.</code></pre>
   <hr class="rule" />
 
   <footer>
-    <p><strong>Status: draft / unstable.</strong> 0.1 documents the format as
-       currently implemented and flags the decisions still to settle before a
-       stable 1.0. Don't treat 0.x as a stability guarantee.</p>
+    <p><strong>Status: draft / unstable.</strong> 0.2 documents the format the
+       first Orma release reads and writes, and flags the decisions still to
+       settle before a stable 1.0. Don't treat 0.x as a stability guarantee.</p>
     <p>Spec text licensed <a href="https://github.com/orma-day/orma-community/blob/main/LICENSE">CC-BY-4.0</a>.
        Tooling under <a href="https://github.com/orma-day/orma-community/blob/main/LICENSE-CODE">Apache-2.0</a>.
        Implementing OMF requires no permission.</p>
