@@ -5,8 +5,8 @@ record — journals, people, places, projects and more — stored as plain
 Markdown files in a folder you control. Human-readable, app-agnostic, yours
 forever.
 
-**→ [Read the 0.1 spec](https://janithkv.github.io/open-memory-format/spec/0.1/)**
- · [Website](https://janithkv.github.io/open-memory-format/)
+**→ [Read the 0.1 spec](https://orma-day.github.io/orma-community/spec/0.1/)**
+ · [Website](https://orma-day.github.io/orma-community/)
  · [Example vault](./example-vault)
 
 > **Status: draft / unstable.** 0.1 documents the format as currently
@@ -51,7 +51,7 @@ artifacts named in [§11](spec/0.1/OMF-0.1-draft.md):
 - [ ] **Reference parser** — a library, extracted from the reference app
 - [x] **Example vault** — see [`example-vault/`](./example-vault)
 
-Discussion happens in [issues](https://github.com/janithkv/open-memory-format/issues).
+Discussion happens in [issues](https://github.com/orma-day/orma-community/issues).
 
 ## Licensing
 
