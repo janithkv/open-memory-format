@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://github.com/orma-day/orma-community/discussions/categories/q-a
+    about: How do I…? Questions and help from other Orma users.
+  - name: Share an idea
+    url: https://github.com/orma-day/orma-community/discussions/categories/ideas
+    about: Talk an idea through before it becomes a feature request.
+  - name: Report a security or privacy problem
+    url: https://github.com/orma-day/orma-community/security/policy
+    about: Please email support@orma.day privately rather than opening a public issue.

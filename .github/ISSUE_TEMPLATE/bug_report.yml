@@ -1,0 +1,62 @@
+name: Bug report
+description: Something in the Orma app isn't working as it should.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this.
+
+        **Issues here are public.** Please don't paste journal entries, names,
+        photos or anything else private. Describe what happened in general
+        terms, and redact screenshots before you attach them.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect to see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The shortest list of steps that makes it happen.
+      placeholder: |
+        1. Open a day
+        2. Tap …
+        3. …
+    validations:
+      required: false
+  - type: input
+    id: version
+    attributes:
+      label: Orma version
+      description: Shown at the bottom of Settings, e.g. "Ōrma v1.4.2".
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Phone and Android version
+      placeholder: e.g. Pixel 8, Android 16
+    validations:
+      required: false
+  - type: dropdown
+    id: storage
+    attributes:
+      label: Where is your vault stored?
+      options:
+        - Google Drive
+        - Dropbox
+        - Nextcloud
+        - Not set up yet
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Redacted screenshots, how often it happens, what you already tried.
+    validations:
+      required: false

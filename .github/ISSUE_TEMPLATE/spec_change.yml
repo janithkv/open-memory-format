@@ -1,0 +1,29 @@
+name: Spec change
+description: Propose a change or clarification to the Open Memory Format.
+labels: ["spec", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For changes to the [Open Memory Format](https://orma-day.github.io/orma-community/spec/0.2/).
+        Typos and small wording fixes can go straight to a pull request.
+  - type: input
+    id: section
+    attributes:
+      label: Which section?
+      placeholder: e.g. 6.3 Tags
+    validations:
+      required: false
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should it say?
+      description: Your proposal, and how it affects vaults that already exist.
+    validations:
+      required: false

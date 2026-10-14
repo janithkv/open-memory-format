@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest something Orma should do.
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Not sure yet, or want to talk an idea through first? Start a thread in
+        [Ideas](https://github.com/orma-day/orma-community/discussions/categories/ideas)
+        instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation or problem, in your own words.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?
+      description: How you imagine Orma could make it easier.
+    validations:
+      required: false
