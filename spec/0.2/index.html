@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Open Memory Format — 0.2 (Draft)</title>
+<meta name="description" content="Open Memory Format 0.2: an open, portable format for a personal memory vault, as plain Markdown files in storage you control." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#F2F0E9; --surface:#FFFFFF; --ink:#241139; --muted:#8a8175;
+    --accent:#8F45AD; --plum:#371C56; --border:#E0DDD6; --border-light:#F0EDE6;
+    --accent-tint:rgba(143,69,173,.07); --code-bg:#FBFAF7;
+    --serif:'Newsreader', Georgia, 'Times New Roman', serif;
+    --sans:'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:16.5px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:820px; margin:0 auto; padding:0 24px 120px; }
+  header.masthead { border-bottom:1px solid var(--border); margin-bottom:40px; padding:64px 0 36px; }
+  .eyebrow { font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0 0 14px; }
+  h1 { font-family:var(--serif); font-weight:500; font-size:clamp(40px,7vw,62px); line-height:1.02; letter-spacing:-.01em; margin:0 0 18px; }
+  .lede { font-family:var(--serif); font-size:20px; color:#4a4458; margin:0 0 24px; max-width:60ch; }
+  .badges { display:flex; gap:10px; flex-wrap:wrap; }
+  .badge { font-size:12.5px; font-weight:500; padding:5px 12px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:#5a5266; }
+  .badge.draft { color:var(--accent); border-color:rgba(143,69,173,.3); background:var(--accent-tint); }
+  .note { background:var(--accent-tint); border:1px solid rgba(143,69,173,.2); border-radius:14px; padding:18px 22px; margin:0 0 48px; font-size:15px; color:#4a4458; }
+  .note strong { color:var(--accent); }
+  nav.toc { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px 28px; margin:0 0 56px; }
+  nav.toc p { margin:0 0 14px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  nav.toc ol { margin:0; padding:0; list-style:none; columns:2; column-gap:36px; }
+  nav.toc li { margin:0 0 9px; break-inside:avoid; }
+  nav.toc a { color:var(--ink); text-decoration:none; font-size:14.5px; border-bottom:1px solid transparent; }
+  nav.toc a:hover { border-bottom-color:var(--accent); color:var(--accent); }
+  @media (max-width:600px){ nav.toc ol { columns:1; } }
+  section { margin:0 0 8px; scroll-margin-top:24px; }
+  h2 { font-family:var(--serif); font-weight:500; font-size:30px; letter-spacing:-.01em; margin:56px 0 4px; padding-top:24px; border-top:1px solid var(--border-light); }
+  h2 .num { color:var(--accent); font-size:18px; font-weight:600; font-family:var(--sans); margin-right:12px; vertical-align:2px; }
+  h2.plain { border-top:none; padding-top:0; }
+  h3 { font-family:var(--serif); font-weight:600; font-size:21px; margin:34px 0 6px; }
+  h4 { font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); margin:26px 0 8px; }
+  p { margin:14px 0; }
+  a { color:var(--accent); }
+  ul, ol.spec { margin:14px 0; padding-left:22px; }
+  li { margin:7px 0; }
+  strong { font-weight:600; }
+  code { font-family:var(--mono); font-size:.86em; background:var(--code-bg); border:1px solid var(--border-light); border-radius:5px; padding:1px 5px; color:var(--plum); }
+  pre { background:var(--code-bg); border:1px solid var(--border); border-radius:12px; padding:18px 20px; overflow:auto; margin:18px 0; line-height:1.55; }
+  pre code { background:none; border:none; padding:0; font-size:13.5px; color:#3a3346; }
+  .tbl { overflow:auto; margin:18px 0; border:1px solid var(--border); border-radius:12px; }
+  table { border-collapse:collapse; width:100%; font-size:14.5px; }
+  th, td { text-align:left; padding:11px 16px; border-bottom:1px solid var(--border-light); vertical-align:top; }
+  th { background:#FBFAF7; font-weight:600; font-size:12.5px; letter-spacing:.03em; text-transform:uppercase; color:#6a6276; }
+  tr:last-child td { border-bottom:none; }
+  td code { white-space:nowrap; }
+  .rule { border:none; border-top:1px solid var(--border); margin:64px 0; }
+  .appendix-tag { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent); font-weight:600; margin:0; }
+  footer { margin-top:72px; padding-top:28px; border-top:1px solid var(--border); color:var(--muted); font-size:14px; }
+  footer a { color:var(--accent); }
+</style>
+<style>.secref{color:#8F45AD;text-decoration:none;border-bottom:1px solid rgba(143,69,173,.28);white-space:nowrap;}.secref:hover{border-bottom-color:#8F45AD;}</style>
+<style>@media (max-width:600px){ .wrap { padding:0 16px 96px; } }</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Open Memory Format</p>
+    <h1>OMF&nbsp;0.2</h1>
+    <p class="lede">An open, portable format for a personal memory vault: plain Markdown files, in storage you control, that any app can read and write.</p>
+    <div class="badges">
+      <span class="badge draft">Draft · unstable</span>
+      <span class="badge">Version 0.2</span>
+      <span class="badge">CommonMark · YAML · Wikilinks</span>
+    </div>
+  </header>
+
+  <div class="note"><strong>Status: draft / unstable.</strong> 0.2 replaces <a href="../0.1/">0.1</a> and describes the vault the first Orma release reads and writes. <a class="secref" href="#9-changes-since-01">Section 9</a> lists what changed. Treat 0.x as a moving target, not a stability guarantee.</div>
+
+  <nav class="toc">
+    <p>Contents</p>
+    <ol>
+      <li><a href="#1-overview">1 · Overview</a></li>
+      <li><a href="#2-vault-layout">2 · Vault layout</a></li>
+      <li><a href="#3-names-and-slugs">3 · Names and slugs</a></li>
+      <li><a href="#4-journal-days">4 · Journal days</a></li>
+      <li><a href="#5-people-places-and-notes">5 · People, places and notes</a></li>
+      <li><a href="#6-text-grammar">6 · Text grammar</a></li>
+      <li><a href="#7-settings-and-identity">7 · Settings and identity</a></li>
+      <li><a href="#8-versioning">8 · Versioning</a></li>
+      <li><a href="#9-changes-since-01">9 · Changes since 0.1</a></li>
+      <li><a href="#10-open-questions">10 · Open questions</a></li>
+      <li><a href="#appendix-a--fields">Appendix A · Fields</a></li>
+      <li><a href="#appendix-b--relation-labels">Appendix B · Relation labels</a></li>
+      <li><a href="#appendix-c--a-complete-example">Appendix C · A complete example</a></li>
+    </ol>
+  </nav>
+
+<h2 id="1-overview"><span class="num">1</span>Overview</h2>
+<p>A <strong>memory vault</strong> is a folder of plain Markdown files: dated journal days,
+undated notes, and the people and places in them, linked together. It lives in
+storage the user controls, such as a local disk, Google Drive, Dropbox or
+Nextcloud. Any app that follows this spec can read the vault and take it over,
+and the vault opens in Obsidian as it is.</p>
+<p>OMF is built from formats people already use:</p>
+<ul>
+<li><strong>CommonMark</strong> for text,</li>
+<li><strong>YAML</strong> frontmatter for structured fields,</li>
+<li><strong>Obsidian conventions</strong> for <code>[[wikilinks]]</code>, <code>![[embeds]]</code> and
+<code>&gt; [!callouts]</code>.</li>
+</ul>
+<p>Orma is the reference implementation.</p>
+<p><strong>Conventions.</strong> MUST, SHOULD and MAY are used as in RFC 2119. Files are UTF-8
+with LF line endings; readers MUST also accept CRLF and a byte-order mark.
+Dates are <code>YYYY-MM-DD</code>.</p>
+<p><strong>The one rule above all.</strong> An app MUST preserve everything it doesn't
+understand: folders, files, frontmatter keys, settings keys and body text. It
+MUST NOT rewrite a file the user didn't change.</p>
+<p><strong>Out of scope:</strong> concurrent editing (writers may assume last-write-wins),
+encryption (the vault is plaintext by design), and app UI.</p>
+<h2 id="2-vault-layout"><span class="num">2</span>Vault layout</h2>
+<pre><code>&lt;vault root&gt;/
+  Journals/YYYY/MM/YYYY-MM-DD.md   # journal days (Section 4)
+  Notes/&lt;title&gt;.md                 # undated notes
+  People/&lt;slug&gt;.md                 # people, groups and the vault owner
+  Places/&lt;slug&gt;.md
+  Photos/…  Videos/…               # attachments
+  .orma/orma_settings.json         # settings (Section 7)
+</code></pre>
+<ul>
+<li>Each top-level folder is a <strong>collection</strong>, and each file in it is one record.
+Folder names are case-sensitive.</li>
+<li>The vault root's name isn't part of the format. Orma calls it <code>My Orma</code>.</li>
+<li><strong>Attachments</strong> live under <code>Photos/</code> and <code>Videos/</code>. Orma names them
+<code>YYYY-MM-DD_&lt;hash&gt;.&lt;ext&gt;</code>, where <code>&lt;hash&gt;</code> is the first 10 hex digits of the
+file's SHA-1. Person photos go in <code>Photos/People/</code>, link thumbnails in
+<code>Photos/Links/</code>. Readers MUST accept any path a file references, and writers
+SHOULD NOT delete an attachment when its last reference goes.</li>
+<li><strong>Conflict copies.</strong> A sync tool that keeps both sides of a conflict names
+the copy <code>&lt;name&gt; (conflict YYYY-MM-DD).md</code>, then <code> 2</code>, <code> 3</code> before the
+extension. A conflict copy is never read as a journal day.</li>
+<li><strong>Reserved names.</strong> Later versions will specify <code>Todos/</code>, <code>Calendar/</code>,
+<code>Health/</code>, user-defined collections such as <code>Movies/</code>, and further files in
+<code>.orma/</code>. A vault may already contain them. Readers MUST preserve them, and
+SHOULD NOT use these names for anything else.</li>
+<li>OMF apps SHOULD NOT write inside <code>.obsidian/</code>.</li>
+</ul>
+<h2 id="3-names-and-slugs"><span class="num">3</span>Names and slugs</h2>
+<p>A record's filename without <code>.md</code> is its <strong>slug</strong>. In People and Places the
+slug is also the record's <strong>handle</strong>, shown as <code>@slug</code>.</p>
+<p><strong>People and Places</strong> use the canonical slug:</p>
+<ol>
+<li>lowercase,</li>
+<li>replace each run of whitespace with <code>-</code>,</li>
+<li>drop every character outside <code>[a-z0-9-]</code>,</li>
+<li>trim <code>-</code> from both ends.</li>
+</ol>
+<p>An empty result becomes <code>entry</code>. When a slug is taken, the next free
+<code>&lt;slug&gt;-2</code>, <code>&lt;slug&gt;-3</code>, … is used. <code>Jane Doe</code> becomes <code>jane-doe</code>; letters
+outside ASCII are dropped, so <code>José</code> becomes <code>jos</code>.</p>
+<p><strong>Notes</strong> keep their title as the filename. Drop <code>\ / : * ? &quot; &lt; &gt; | # ^ [ ]</code>,
+collapse whitespace, strip leading dots and cut to 80 characters; an empty
+result becomes <code>Untitled</code>. &quot;Trip ideas&quot; is <code>Notes/Trip ideas.md</code>.</p>
+<p>Rules:</p>
+<ul>
+<li>Writers MUST create People and Places files with lowercase slugs, and MUST
+NOT rename an existing file just because its name isn't canonical.</li>
+<li>Readers SHOULD compare slugs ignoring case. Some storage treats <code>Sam.md</code> and
+<code>sam.md</code> as one file.</li>
+<li><strong>Renaming</strong> a record renames its file, and the writer MUST rewrite every
+wikilink to it across the vault.</li>
+</ul>
+<h2 id="4-journal-days"><span class="num">4</span>Journal days</h2>
+<p>Path: <code>Journals/YYYY/MM/YYYY-MM-DD.md</code>. The filename is the date. Readers
+SHOULD also accept a flat <code>Journals/YYYY-MM-DD.md</code>.</p>
+<pre><code class="language-markdown">---
+location: &quot;[[Places/anytown|Anytown]]&quot;
+---
+# A good day
+
+Coffee with [[People/jane-doe|@jane-doe]] before the train. #slow
+
+## Lunch
+
+Noodles with [[People/sam|@sam]]. #food
+</code></pre>
+<ul>
+<li><strong>Frontmatter is optional.</strong> Two keys are defined:
+<ul>
+<li><code>tags</code>: tags for the whole day (<a href="#63-tags">Section 6.3</a>).</li>
+<li><code>location</code>: a wikilink to the place the day was written. An empty
+<code>location:</code> means the user removed the place, and apps MUST NOT fill it in
+again.</li>
+</ul>
+</li>
+<li>Frontmatter starts only on a first line that is exactly <code>---</code>. A line like
+<code>--- Day 2 ---</code> is ordinary text.</li>
+<li><strong>Title.</strong> An optional first line <code># Title</code>.</li>
+<li><strong>Notes inside a day.</strong> Each <code>##</code> heading starts a section. <code>###</code> and deeper
+headings belong to the section above them.</li>
+</ul>
+<h2 id="5-people-places-and-notes"><span class="num">5</span>People, places and notes</h2>
+<p>These records are YAML frontmatter followed by an optional Markdown body:</p>
+<pre><code class="language-markdown">---
+name: Jane Doe
+type: person
+birthday: 1990-04-12
+relations:
+  - &quot;[[People/john-doe|John Doe (brother)]]&quot;
+places:
+  - &quot;[[Places/anytown|Anytown (home)]]&quot;
+---
+
+Met at university. #friends
+</code></pre>
+<ul>
+<li><strong><code>name</code></strong> is the display name. Readers fall back to the slug.</li>
+<li><strong><code>type</code></strong> is <code>person</code>, <code>self</code> or <code>group</code> in People (no <code>type</code> means
+<code>person</code>), and <code>place</code> in Places. Notes have no <code>type</code>.</li>
+<li>Frontmatter MUST be valid YAML. A value that starts with <code>[[</code> MUST be
+double-quoted, or YAML reads it as a list.</li>
+<li>Writers leave out empty values.</li>
+<li>The <strong>body</strong> is free Markdown with the same grammar as a journal day.</li>
+</ul>
+<p>Appendix A lists every field.</p>
+<h3 id="51-links-between-records">5.1 Links between records</h3>
+<p>A <strong>link block</strong> is a frontmatter key holding a list of wikilinks:
+<code>relations</code> (person to person), <code>places</code> (person to place) and <code>people</code>
+(place to person).</p>
+<ul>
+<li>A <strong>label</strong> goes at the end of the link's display text, in parentheses. It
+describes the linked record from this file's point of view:
+<code>[[People/john-doe|John Doe (brother)]]</code> on Jane's file means John is her
+brother.</li>
+<li>When X links to Y with a label, the writer SHOULD add the matching link back
+from Y to X, using the inverse label in Appendix B.</li>
+<li><strong>The vault owner</strong> is the one People file with <code>type: self</code>. Links between
+the owner and someone else are stored only on the other person's file, so
+the owner's file never fills up with back-links.</li>
+</ul>
+<h2 id="6-text-grammar"><span class="num">6</span>Text grammar</h2>
+<h3 id="61-wikilinks-and-mentions">6.1 Wikilinks and mentions</h3>
+<pre><code>[[Folder/slug]]             a link
+[[Folder/slug|display]]     a link with display text
+</code></pre>
+<ul>
+<li><code>Folder/slug</code> points at <code>Folder/slug.md</code>.</li>
+<li>Writers MUST include the folder. A bare <code>[[slug]]</code> is not an OMF link.</li>
+<li>Every wikilink counts as a <strong>backlink</strong>: the linked record can list the files
+that point to it.</li>
+<li>A <strong>mention</strong> is a wikilink whose display text is <code>@slug</code>:
+<code>[[People/jane-doe|@jane-doe]]</code>. That's what writers produce.</li>
+<li>A bare <code>@slug</code> in text is also a mention. It matches lowercase slugs only, and
+not inside an email address. It has no folder, so it can match any
+collection.</li>
+</ul>
+<h3 id="62-external-links-and-link-cards">6.2 External links and link cards</h3>
+<p>Writers use inline links, <code>[text](https://example.com)</code>, and add <code>https://</code>
+when the scheme is missing.</p>
+<p>A link MAY carry a <strong>preview card</strong>, written as an Obsidian callout:</p>
+<pre><code class="language-markdown">&gt; [!link] [Page title](https://example.com/article)
+&gt; ![[Photos/Links/2026-10-11_ab12cd34ef.jpg]]
+&gt; example.com · A one-line description of the page.
+</code></pre>
+<ul>
+<li>Line 1 holds exactly one link. Line 2, an optional thumbnail, and line 3,
+<code>host</code> or <code>host · description</code> of at most 200 characters.</li>
+<li>Any other quote block is ordinary text.</li>
+<li>Tags inside a card don't count.</li>
+</ul>
+<h3 id="63-tags">6.3 Tags</h3>
+<ul>
+<li>A tag is <code>#</code> followed by letters, digits, <code>_</code>, <code>-</code> or <code>/</code>, at the start of a
+line or after a space. It needs at least one letter or <code>_</code>, so <code>#2026</code> isn't
+a tag.</li>
+<li>Tags are case-insensitive and stored lowercase. <code>/</code> nests:
+<code>#travel/japan</code> sits under <code>travel</code>.</li>
+<li>Tags in code are ignored.</li>
+<li><strong>Scope.</strong> Tags before the first <code>##</code>, and frontmatter <code>tags:</code>, apply to the
+whole file. Tags under a <code>##</code> heading apply to that section.</li>
+<li>Writers SHOULD add new tags inline. There is no tag list file: tags exist
+only in the text.</li>
+</ul>
+<h3 id="64-embeds">6.4 Embeds</h3>
+<p>Attachments are embedded on a line of their own:</p>
+<pre><code class="language-markdown">![[Photos/2026-07-03_ab12cd34ef.jpg]]
+</code></pre>
+<p>A person's photo is a frontmatter field instead:
+<code>photo: &quot;[[Photos/People/jane-doe_ab12cd34ef.jpg]]&quot;</code>.</p>
+<p><code>![[Folder/file#Heading]]</code> shows the section under that heading from another
+file. Readers SHOULD render it; Orma doesn't write it at present.</p>
+<h2 id="7-settings-and-identity"><span class="num">7</span>Settings and identity</h2>
+<p>Settings live in <code>.orma/orma_settings.json</code>. Only two keys belong to OMF:</p>
+<pre><code class="language-json">{
+  &quot;omf_version&quot;: &quot;0.2&quot;,
+  &quot;user&quot;: { &quot;person_slug&quot;: &quot;jordan-doe&quot;, &quot;person_name&quot;: &quot;Jordan&quot; }
+}
+</code></pre>
+<ul>
+<li><code>omf_version</code> (required) is the OMF version the vault follows.</li>
+<li><code>user.person_slug</code> names the vault owner's People file, the one with
+<code>type: self</code>. If it's missing, an app MAY find that file and repair the
+pointer.</li>
+<li>Every other key is app state, such as Orma's <code>apps</code>, <code>nav_order</code>, <code>pins</code>,
+<code>nudge_state</code> and <code>location_enabled</code>. Readers MUST preserve all of it.</li>
+</ul>
+<h2 id="8-versioning"><span class="num">8</span>Versioning</h2>
+<ul>
+<li>A writer MUST set <code>omf_version</code> to the version it follows: <code>&quot;0.2&quot;</code>. A
+missing value means <code>&quot;0.1&quot;</code>.</li>
+<li>A 0.2 reader MUST read a 0.1 vault, which means accepting these older forms:
+<ul>
+<li><code>orma_settings.json</code> (and an older <code>apps.json</code>) at the vault root, not in
+<code>.orma/</code>;</li>
+<li>reference-style images: <code>![Photo][img-1]</code> plus <code>[img-1]: Photos/…</code>;</li>
+<li><code>kind:</code> instead of <code>category:</code> on places;</li>
+<li>a <code>📍 [[Places/…]]</code> line in a day, which Orma moves into <code>location:</code>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-changes-since-01"><span class="num">9</span>Changes since 0.1</h2>
+<ul>
+<li><strong>Simpler scope.</strong> 0.2 covers journal days, notes, people and places. Health,
+Movies, Projects, Dreams and timeline logs are reserved for later versions.</li>
+<li><strong>Settings moved</strong> into <code>.orma/</code>.</li>
+<li><strong>Attachments</strong> are <code>![[…]]</code> embeds, not reference-style images.</li>
+<li><strong>Journal days</strong> may have frontmatter: <code>tags</code> and <code>location</code>.</li>
+<li><strong>New:</strong> notes, people groups, phones, emails and photos, inline tags,
+external links and link cards, conflict copies.</li>
+<li><strong>Mentions</strong> are written as <code>[[Folder/slug|@slug]]</code>.</li>
+</ul>
+<h2 id="10-open-questions"><span class="num">10</span>Open questions</h2>
+<p>Still to settle before 1.0:</p>
+<ol>
+<li>Should <code>type</code> stay when it repeats the folder (<code>type: place</code>)?</li>
+<li>Should writers stop producing bare <code>@slug</code> mentions? Renames don't update
+them.</li>
+<li>Should Orma's app state move out of the settings file's top level?</li>
+<li>Should notes use canonical slugs like everything else?</li>
+<li>Should section embeds stay in the format?</li>
+</ol>
+<p>1.0 will ship with this spec, an example vault, a validator and a reference
+parser. The spec text is licensed CC-BY-4.0, and implementing OMF needs no
+permission.</p>
+<hr />
+<h2 id="appendix-a--fields">Appendix A — Fields</h2>
+<p>All fields except <code>name</code> are optional. Unknown fields MUST be preserved.</p>
+<h2 id="people">People</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>display name</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>person</code> (or absent), <code>self</code> for the vault owner, <code>group</code> for a group</td>
+</tr>
+<tr>
+<td><code>birthday</code></td>
+<td><code>YYYY-MM-DD</code></td>
+</tr>
+<tr>
+<td><code>phones</code></td>
+<td>list like <code>&quot;+1 555 0100 (mobile)&quot;</code></td>
+</tr>
+<tr>
+<td><code>emails</code></td>
+<td>list like <code>&quot;jane@example.com (work)&quot;</code></td>
+</tr>
+<tr>
+<td><code>photo</code></td>
+<td><code>&quot;[[Photos/People/&lt;file&gt;]]&quot;</code></td>
+</tr>
+<tr>
+<td><code>relations</code></td>
+<td>links to people</td>
+</tr>
+<tr>
+<td><code>places</code></td>
+<td>links to places</td>
+</tr>
+</tbody>
+</table></div>
+<p>A <strong>group</strong> is a People file with <code>type: group</code> and an optional <code>emoji</code>. It
+lists members as <code>&quot;[[People/sam|Sam (member)]]&quot;</code> under <code>relations</code>, and each
+member links back with the label <code>(group)</code>. Groups don't contain groups.</p>
+<h2 id="places">Places</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>place name</td>
+</tr>
+<tr>
+<td><code>type</code></td>
+<td><code>place</code></td>
+</tr>
+<tr>
+<td><code>category</code></td>
+<td>e.g. Café, Park, Home, City</td>
+</tr>
+<tr>
+<td><code>address</code></td>
+<td>postal address</td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>&quot;lat, long&quot;</code> in decimal degrees</td>
+</tr>
+<tr>
+<td><code>people</code></td>
+<td>links to people</td>
+</tr>
+<tr>
+<td><code>unconfirmed</code></td>
+<td><code>true</code> on a place an app captured automatically and the user hasn't reviewed</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="notes">Notes</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>the title; without it, the filename is the title</td>
+</tr>
+<tr>
+<td><code>tags</code></td>
+<td>tags for the whole note</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="appendix-b--relation-labels">Appendix B — Relation labels</h2>
+<p>When X links to Y with a label, Y links back to X with its inverse.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Label</th>
+<th>Inverse</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>parent</td>
+<td>child</td>
+</tr>
+<tr>
+<td>grandparent</td>
+<td>grandchild</td>
+</tr>
+<tr>
+<td>aunt, uncle, aunt/uncle</td>
+<td>niece/nephew</td>
+</tr>
+<tr>
+<td>manager</td>
+<td>employee</td>
+</tr>
+<tr>
+<td>mentor</td>
+<td>mentee</td>
+</tr>
+<tr>
+<td>member</td>
+<td>group</td>
+</tr>
+</tbody>
+</table></div>
+<p>Each pair also works backwards, so <code>child</code> inverts to <code>parent</code>. Gendered words
+invert to the neutral form: <code>brother</code> and <code>sister</code> to <code>sibling</code>, <code>boyfriend</code>
+and <code>girlfriend</code> to <code>partner</code>. Any other label, such as <code>friend</code>, <code>spouse</code> or
+<code>home</code>, is its own inverse.</p>
+<hr />
+<h2 id="appendix-c--a-complete-example">Appendix C — A complete example</h2>
+<p><code>Journals/2026/10/2026-10-12.md</code>:</p>
+<pre><code class="language-markdown">---
+location: &quot;[[Places/anytown|Anytown]]&quot;
+---
+# Long Sunday
+
+Slow start. Coffee with [[People/jane-doe|@jane-doe]]. #slow
+
+![[Photos/2026-10-12_ab12cd34ef.jpg]]
+
+## Run
+
+Down by the river with [[People/sam|@sam]]. #running
+
+## Reading
+
+&gt; [!link] [The science of rest](https://example.com/rest)
+&gt; example.com · A long read about recovery.
+</code></pre>
+<ul>
+<li>The day was written at Anytown and is titled &quot;Long Sunday&quot;.</li>
+<li>It has two notes, &quot;Run&quot; and &quot;Reading&quot;.</li>
+<li><code>#slow</code> tags the whole day; <code>#running</code> tags only the Run note.</li>
+<li><code>jane-doe</code>, <code>sam</code> and <code>anytown</code> each get a backlink to this day.</li>
+</ul>
+
+  <footer>
+    Open Memory Format 0.2 (draft) · generated from
+    <a href="OMF-0.2-draft.md">OMF-0.2-draft.md</a> ·
+    <a href="../../">Open Memory Format home</a>
+  </footer>
+
+</div>
+</body>
+</html>

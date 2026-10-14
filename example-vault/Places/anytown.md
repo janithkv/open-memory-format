@@ -1,7 +1,11 @@
 ---
+name: Anytown
 type: place
-kind: city
-country: Example
+category: City
+coordinates: "12.9716, 77.5946"
+people:
+  - "[[People/jordan-doe|Jordan Doe (home)]]"
+  - "[[People/jane-doe|Jane Doe (home)]]"
 ---
 
-A placeholder location referenced by the people above.
+A placeholder city.

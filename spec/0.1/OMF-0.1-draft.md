@@ -1,5 +1,7 @@
 # Open Memory Format (OMF) — 0.1 (DRAFT)
 
+> **Superseded by [0.2](../0.2/OMF-0.2-draft.md).** Kept unchanged for reference.
+
 > **Status: draft / unstable.** OMF is the open vault format that the Orma app
 > reads and writes. This 0.1 documents the format *as currently implemented* and
 > flags the decisions that must be settled before a stable 1.0. Do not treat
