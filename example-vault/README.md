@@ -12,6 +12,8 @@ example-vault/
   People/jane-doe.md               # a person
   People/hiking-club.md            # a group (type: group)
   Places/anytown.md                # a place
+  Todos/book-train-tickets.md      # a to-do
+  Calendar/series--events--janes-birthday--65fc.md   # a yearly event
 ```
 
 All names and places are fictional.
@@ -28,5 +30,7 @@ Things to notice:
   vault owner's file, which never collects back-links.
 - **Tags are inline:** `#grateful` tags the whole day, `#outdoors` only the
   Evening note.
+- **To-dos and events use `title`, not `name`.** An event's filename is only a
+  hint; its frontmatter is the truth.
 - **Wikilinks in frontmatter are quoted**, because YAML would otherwise read
   `[[…]]` as a list.

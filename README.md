@@ -28,7 +28,8 @@ names, photos or anything else private.
 # Open Memory Format (OMF)
 
 **Your memories, in files you own.** OMF is an open format for a life's
-record — journal days, notes, and the people and places in them — stored as
+record — journal days, notes, to-dos, events, and the people and places in
+them — stored as
 plain Markdown files in a folder you control. Human-readable, app-agnostic, yours
 forever.
 

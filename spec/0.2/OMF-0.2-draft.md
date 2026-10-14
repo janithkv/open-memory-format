@@ -8,7 +8,8 @@
 ## 1. Overview
 
 A **memory vault** is a folder of plain Markdown files: dated journal days,
-undated notes, and the people and places in them, linked together. It lives in
+undated notes, to-dos and events, and the people and places in them, linked
+together. It lives in
 storage the user controls, such as a local disk, Google Drive, Dropbox or
 Nextcloud. Any app that follows this spec can read the vault and take it over,
 and the vault opens in Obsidian as it is.
@@ -41,6 +42,8 @@ encryption (the vault is plaintext by design), and app UI.
   Notes/<title>.md                 # undated notes
   People/<slug>.md                 # people, groups and the vault owner
   Places/<slug>.md
+  Todos/<slug>.md                  # to-dos
+  Calendar/<event-file>.md         # events (Section 3)
   Photos/…  Videos/…               # attachments
   .orma/orma_settings.json         # settings (Section 7)
 ```
@@ -56,9 +59,8 @@ encryption (the vault is plaintext by design), and app UI.
 - **Conflict copies.** A sync tool that keeps both sides of a conflict names
   the copy `<name> (conflict YYYY-MM-DD).md`, then ` 2`, ` 3` before the
   extension. A conflict copy is never read as a journal day.
-- **Reserved names.** Later versions will specify `Todos/`, `Calendar/`,
-  `Health/`, user-defined collections such as `Movies/`, and further files in
-  `.orma/`. A vault may already contain them. Readers MUST preserve them, and
+- **Reserved names.** Later versions will specify `Health/`, user-defined
+  collections such as `Movies/`, and further files in `.orma/`. A vault may already contain them. Readers MUST preserve them, and
   SHOULD NOT use these names for anything else.
 - OMF apps SHOULD NOT write inside `.obsidian/`.
 
@@ -67,7 +69,7 @@ encryption (the vault is plaintext by design), and app UI.
 A record's filename without `.md` is its **slug**. In People and Places the
 slug is also the record's **handle**, shown as `@slug`.
 
-**People and Places** use the canonical slug:
+**People, Places and To-dos** use the canonical slug:
 
 1. lowercase,
 2. replace each run of whitespace with `-`,
@@ -82,9 +84,15 @@ outside ASCII are dropped, so `José` becomes `jos`.
 collapse whitespace, strip leading dots and cut to 80 characters; an empty
 result becomes `Untitled`. "Trip ideas" is `Notes/Trip ideas.md`.
 
+**Calendar** files are named `<YYYY-MM-DD>--events--<title-slug>--<hash>.md`,
+or `series--events--…` for a repeating event. `<title-slug>` is the canonical
+slug cut to 40 characters, and `<hash>` is the first 4 hex digits of the SHA-1
+of `app_events <id>`. The name is only a hint: the frontmatter is the truth,
+and retitling or rescheduling an event never renames its file.
+
 Rules:
 
-- Writers MUST create People and Places files with lowercase slugs, and MUST
+- Writers MUST create People, Places and To-dos files with lowercase slugs, and MUST
   NOT rename an existing file just because its name isn't canonical.
 - Readers SHOULD compare slugs ignoring case. Some storage treats `Sam.md` and
   `sam.md` as one file.
@@ -120,9 +128,10 @@ Noodles with [[People/sam|@sam]]. #food
 - **Notes inside a day.** Each `##` heading starts a section. `###` and deeper
   headings belong to the section above them.
 
-## 5. People, places and notes
+## 5. Records
 
-These records are YAML frontmatter followed by an optional Markdown body:
+People, places, notes, to-dos and events are YAML frontmatter followed by an
+optional Markdown body:
 
 ```markdown
 ---
@@ -138,9 +147,10 @@ places:
 Met at university. #friends
 ```
 
-- **`name`** is the display name. Readers fall back to the slug.
+- **`name`** is the display name; to-dos and events use **`title`** instead.
+  Readers fall back to the slug.
 - **`type`** is `person`, `self` or `group` in People (no `type` means
-  `person`), and `place` in Places. Notes have no `type`.
+  `person`), and `place` in Places. Notes, to-dos and events have no `type`.
 - Frontmatter MUST be valid YAML. A value that starts with `[[` MUST be
   double-quoted, or YAML reads it as a list.
 - Writers leave out empty values.
@@ -259,12 +269,13 @@ Settings live in `.orma/orma_settings.json`. Only two keys belong to OMF:
 
 ## 9. Changes since 0.1
 
-- **Simpler scope.** 0.2 covers journal days, notes, people and places. Health,
-  Movies, Projects, Dreams and timeline logs are reserved for later versions.
+- **Simpler scope.** 0.2 covers journal days, notes, people, places, to-dos and
+  events. Health, Movies, Projects, Dreams and timeline logs are reserved for
+  later versions.
 - **Settings moved** into `.orma/`.
 - **Attachments** are `![[…]]` embeds, not reference-style images.
 - **Journal days** may have frontmatter: `tags` and `location`.
-- **New:** notes, people groups, phones, emails and photos, inline tags,
+- **New:** notes, to-dos, calendar events, people groups, phones, emails and photos, inline tags,
   external links and link cards, conflict copies.
 - **Mentions** are written as `[[Folder/slug|@slug]]`.
 
@@ -324,6 +335,30 @@ member links back with the label `(group)`. Groups don't contain groups.
 |---|---|
 | `name` | the title; without it, the filename is the title |
 | `tags` | tags for the whole note |
+
+## To-dos
+
+| Field | Meaning |
+|---|---|
+| `title` | the task |
+| `due` | `YYYY-MM-DD`; absent means any time |
+| `leadDays` | days of warning before `due` |
+| `done` | `true` when finished |
+| `doneAt` | when it was finished, as a local ISO 8601 date-time |
+
+## Calendar events
+
+| Field | Meaning |
+|---|---|
+| `title` | event title |
+| `app` | `app_events` |
+| `start` | `YYYY-MM-DD`, the event's first day |
+| `time` | `"HH:MM"`, local time, always quoted; absent means all day |
+| `rrule` | how it repeats, as an RFC 5545 RRULE, e.g. `FREQ=YEARLY` |
+| `exdate` | list of skipped dates |
+| `id` | a UUID that stays the same for the event's life |
+
+Events last a single day.
 
 ---
 

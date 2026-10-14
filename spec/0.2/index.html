@@ -98,7 +98,7 @@
       <li><a href="#2-vault-layout">2 · Vault layout</a></li>
       <li><a href="#3-names-and-slugs">3 · Names and slugs</a></li>
       <li><a href="#4-journal-days">4 · Journal days</a></li>
-      <li><a href="#5-people-places-and-notes">5 · People, places and notes</a></li>
+      <li><a href="#5-records">5 · Records</a></li>
       <li><a href="#6-text-grammar">6 · Text grammar</a></li>
       <li><a href="#7-settings-and-identity">7 · Settings and identity</a></li>
       <li><a href="#8-versioning">8 · Versioning</a></li>
@@ -112,7 +112,8 @@
 
 <h2 id="1-overview"><span class="num">1</span>Overview</h2>
 <p>A <strong>memory vault</strong> is a folder of plain Markdown files: dated journal days,
-undated notes, and the people and places in them, linked together. It lives in
+undated notes, to-dos and events, and the people and places in them, linked
+together. It lives in
 storage the user controls, such as a local disk, Google Drive, Dropbox or
 Nextcloud. Any app that follows this spec can read the vault and take it over,
 and the vault opens in Obsidian as it is.</p>
@@ -138,6 +139,8 @@ encryption (the vault is plaintext by design), and app UI.</p>
   Notes/&lt;title&gt;.md                 # undated notes
   People/&lt;slug&gt;.md                 # people, groups and the vault owner
   Places/&lt;slug&gt;.md
+  Todos/&lt;slug&gt;.md                  # to-dos
+  Calendar/&lt;event-file&gt;.md         # events (Section 3)
   Photos/…  Videos/…               # attachments
   .orma/orma_settings.json         # settings (Section 7)
 </code></pre>
@@ -153,16 +156,15 @@ SHOULD NOT delete an attachment when its last reference goes.</li>
 <li><strong>Conflict copies.</strong> A sync tool that keeps both sides of a conflict names
 the copy <code>&lt;name&gt; (conflict YYYY-MM-DD).md</code>, then <code> 2</code>, <code> 3</code> before the
 extension. A conflict copy is never read as a journal day.</li>
-<li><strong>Reserved names.</strong> Later versions will specify <code>Todos/</code>, <code>Calendar/</code>,
-<code>Health/</code>, user-defined collections such as <code>Movies/</code>, and further files in
-<code>.orma/</code>. A vault may already contain them. Readers MUST preserve them, and
+<li><strong>Reserved names.</strong> Later versions will specify <code>Health/</code>, user-defined
+collections such as <code>Movies/</code>, and further files in <code>.orma/</code>. A vault may already contain them. Readers MUST preserve them, and
 SHOULD NOT use these names for anything else.</li>
 <li>OMF apps SHOULD NOT write inside <code>.obsidian/</code>.</li>
 </ul>
 <h2 id="3-names-and-slugs"><span class="num">3</span>Names and slugs</h2>
 <p>A record's filename without <code>.md</code> is its <strong>slug</strong>. In People and Places the
 slug is also the record's <strong>handle</strong>, shown as <code>@slug</code>.</p>
-<p><strong>People and Places</strong> use the canonical slug:</p>
+<p><strong>People, Places and To-dos</strong> use the canonical slug:</p>
 <ol>
 <li>lowercase,</li>
 <li>replace each run of whitespace with <code>-</code>,</li>
@@ -175,9 +177,14 @@ outside ASCII are dropped, so <code>José</code> becomes <code>jos</code>.</p>
 <p><strong>Notes</strong> keep their title as the filename. Drop <code>\ / : * ? &quot; &lt; &gt; | # ^ [ ]</code>,
 collapse whitespace, strip leading dots and cut to 80 characters; an empty
 result becomes <code>Untitled</code>. &quot;Trip ideas&quot; is <code>Notes/Trip ideas.md</code>.</p>
+<p><strong>Calendar</strong> files are named <code>&lt;YYYY-MM-DD&gt;--events--&lt;title-slug&gt;--&lt;hash&gt;.md</code>,
+or <code>series--events--…</code> for a repeating event. <code>&lt;title-slug&gt;</code> is the canonical
+slug cut to 40 characters, and <code>&lt;hash&gt;</code> is the first 4 hex digits of the SHA-1
+of <code>app_events &lt;id&gt;</code>. The name is only a hint: the frontmatter is the truth,
+and retitling or rescheduling an event never renames its file.</p>
 <p>Rules:</p>
 <ul>
-<li>Writers MUST create People and Places files with lowercase slugs, and MUST
+<li>Writers MUST create People, Places and To-dos files with lowercase slugs, and MUST
 NOT rename an existing file just because its name isn't canonical.</li>
 <li>Readers SHOULD compare slugs ignoring case. Some storage treats <code>Sam.md</code> and
 <code>sam.md</code> as one file.</li>
@@ -213,8 +220,9 @@ again.</li>
 <li><strong>Notes inside a day.</strong> Each <code>##</code> heading starts a section. <code>###</code> and deeper
 headings belong to the section above them.</li>
 </ul>
-<h2 id="5-people-places-and-notes"><span class="num">5</span>People, places and notes</h2>
-<p>These records are YAML frontmatter followed by an optional Markdown body:</p>
+<h2 id="5-records"><span class="num">5</span>Records</h2>
+<p>People, places, notes, to-dos and events are YAML frontmatter followed by an
+optional Markdown body:</p>
 <pre><code class="language-markdown">---
 name: Jane Doe
 type: person
@@ -228,9 +236,10 @@ places:
 Met at university. #friends
 </code></pre>
 <ul>
-<li><strong><code>name</code></strong> is the display name. Readers fall back to the slug.</li>
+<li><strong><code>name</code></strong> is the display name; to-dos and events use <strong><code>title</code></strong> instead.
+Readers fall back to the slug.</li>
 <li><strong><code>type</code></strong> is <code>person</code>, <code>self</code> or <code>group</code> in People (no <code>type</code> means
-<code>person</code>), and <code>place</code> in Places. Notes have no <code>type</code>.</li>
+<code>person</code>), and <code>place</code> in Places. Notes, to-dos and events have no <code>type</code>.</li>
 <li>Frontmatter MUST be valid YAML. A value that starts with <code>[[</code> MUST be
 double-quoted, or YAML reads it as a list.</li>
 <li>Writers leave out empty values.</li>
@@ -334,12 +343,13 @@ missing value means <code>&quot;0.1&quot;</code>.</li>
 </ul>
 <h2 id="9-changes-since-01"><span class="num">9</span>Changes since 0.1</h2>
 <ul>
-<li><strong>Simpler scope.</strong> 0.2 covers journal days, notes, people and places. Health,
-Movies, Projects, Dreams and timeline logs are reserved for later versions.</li>
+<li><strong>Simpler scope.</strong> 0.2 covers journal days, notes, people, places, to-dos and
+events. Health, Movies, Projects, Dreams and timeline logs are reserved for
+later versions.</li>
 <li><strong>Settings moved</strong> into <code>.orma/</code>.</li>
 <li><strong>Attachments</strong> are <code>![[…]]</code> embeds, not reference-style images.</li>
 <li><strong>Journal days</strong> may have frontmatter: <code>tags</code> and <code>location</code>.</li>
-<li><strong>New:</strong> notes, people groups, phones, emails and photos, inline tags,
+<li><strong>New:</strong> notes, to-dos, calendar events, people groups, phones, emails and photos, inline tags,
 external links and link cards, conflict copies.</li>
 <li><strong>Mentions</strong> are written as <code>[[Folder/slug|@slug]]</code>.</li>
 </ul>
@@ -463,6 +473,77 @@ member links back with the label <code>(group)</code>. Groups don't contain grou
 </tr>
 </tbody>
 </table></div>
+<h2 id="to-dos">To-dos</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title</code></td>
+<td>the task</td>
+</tr>
+<tr>
+<td><code>due</code></td>
+<td><code>YYYY-MM-DD</code>; absent means any time</td>
+</tr>
+<tr>
+<td><code>leadDays</code></td>
+<td>days of warning before <code>due</code></td>
+</tr>
+<tr>
+<td><code>done</code></td>
+<td><code>true</code> when finished</td>
+</tr>
+<tr>
+<td><code>doneAt</code></td>
+<td>when it was finished, as a local ISO 8601 date-time</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="calendar-events">Calendar events</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>title</code></td>
+<td>event title</td>
+</tr>
+<tr>
+<td><code>app</code></td>
+<td><code>app_events</code></td>
+</tr>
+<tr>
+<td><code>start</code></td>
+<td><code>YYYY-MM-DD</code>, the event's first day</td>
+</tr>
+<tr>
+<td><code>time</code></td>
+<td><code>&quot;HH:MM&quot;</code>, local time, always quoted; absent means all day</td>
+</tr>
+<tr>
+<td><code>rrule</code></td>
+<td>how it repeats, as an RFC 5545 RRULE, e.g. <code>FREQ=YEARLY</code></td>
+</tr>
+<tr>
+<td><code>exdate</code></td>
+<td>list of skipped dates</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>a UUID that stays the same for the event's life</td>
+</tr>
+</tbody>
+</table></div>
+<p>Events last a single day.</p>
 <hr />
 <h2 id="appendix-b--relation-labels">Appendix B — Relation labels</h2>
 <p>When X links to Y with a label, Y links back to X with its inverse.</p>
