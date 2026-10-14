@@ -96,6 +96,12 @@ def build(version: str) -> Path:
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Open Memory Format — {version} (Draft)</title>
 <meta name="description" content="Open Memory Format {version}: an open, portable format for a personal memory vault, as plain Markdown files in storage you control." />
+<link rel="icon" type="image/png" sizes="32x32" href="../../assets/brand/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="../../assets/brand/favicon-16.png" />
+<link rel="apple-touch-icon" href="../../assets/brand/apple-touch-icon.png" />
+<meta property="og:image" content="https://orma-day.github.io/orma-community/assets/brand/social-preview.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
